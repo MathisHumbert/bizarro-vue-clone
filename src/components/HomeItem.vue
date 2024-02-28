@@ -1,11 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router';
 import Prefix from 'prefix';
+import gsap from 'gsap';
 
 import { getOffset } from '../utils/dom';
 import emitter from '../utils/eventBus';
-import { usePageStore } from '../stores/page';
+import { delay } from '../utils/math';
 
 const isBefore = ref(false);
 const isAfter = ref(false);
@@ -13,10 +14,28 @@ const extra = ref(0);
 const offset = ref(null);
 const element = ref(null);
 
-const props = defineProps(['id', 'title', 'direction', 'containerHeight']);
-const pageStore = usePageStore();
+const props = defineProps([
+  'id',
+  'title',
+  'direction',
+  'containerHeight',
+  'scroll',
+]);
+const router = useRouter();
 
 const transformPrefix = Prefix('transform');
+
+const onLinkClick = async (e) => {
+  e.preventDefault();
+
+  gsap.to('.home', { autoAlpha: 0 });
+
+  await delay(2000);
+
+  const url = e.target.href.replace(window.location.origin, '');
+
+  router.push(url);
+};
 
 onMounted(() => {
   offset.value = getOffset(element.value);
@@ -27,8 +46,7 @@ onMounted(() => {
   });
 
   emitter.on('tick', () => {
-    const { containerHeight } = props;
-    const { scroll } = pageStore;
+    const { containerHeight, scroll } = props;
 
     const position = -scroll.current - extra.value;
     const offsetPostion = position + offset.value.top + offset.value.height;
@@ -61,7 +79,7 @@ onMounted(() => {
 
 <template>
   <li :class="`home__item home__item--${props.id}`" ref="element">
-    <RouterLink :to="`/case/${props.id}`" class="home__link">
+    <a :href="`/case/${props.id}`" @click="onLinkClick" class="home__link">
       <span class="home__link__wrapper">
         {{ props.title }}
         <img
@@ -69,9 +87,8 @@ onMounted(() => {
           :alt="props.id"
           :data-direction="props.direction"
           class="home__link__media"
-        />
-      </span>
-    </RouterLink>
+        /> </span
+    ></a>
   </li>
 </template>
 

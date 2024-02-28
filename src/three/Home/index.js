@@ -12,16 +12,19 @@ export default class Home {
   }
 
   createGallery() {
-    this.mediaElements = document.querySelectorAll('.home__item');
+    const mediaElements = document.querySelectorAll('.home__item');
+    const caseMedia = document.querySelector('.home__case__media');
     this.containerElement = document.querySelector('.home__list');
 
-    this.medias = [...this.mediaElements].map((element) => {
+    this.medias = [...mediaElements].map((element) => {
       const homeLink = element.querySelector('.home__link');
       const homeMedia = element.querySelector('.home__link__media');
 
       return new Media({
+        homeItem: element,
         homeLink,
         homeMedia,
+        caseMedia,
         scene: this.group,
         geometry: this.geometry,
         screen: this.screen,
@@ -38,6 +41,7 @@ export default class Home {
     this.createGallery();
 
     this.scene.add(this.group);
+
     this.medias.forEach((media) => {
       if (media && media.show) {
         media.show();

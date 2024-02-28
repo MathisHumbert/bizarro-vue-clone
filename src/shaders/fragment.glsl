@@ -2,10 +2,10 @@ precision mediump float;
 
 uniform sampler2D uTexture;
 uniform float uAlpha;
+uniform float uMultiplier;
 
 varying vec2 vUv;
 varying float vDisplacement;
-varying float vMultiplier;
 
 vec3 saturation(vec3 rgb, float adjustment) {
   const vec3 W = vec3(0.2125, 0.7154, 0.0721);
@@ -18,7 +18,7 @@ void main(){
   float value = 1.;
 
   if(vDisplacement > 0.){
-    texture += vDisplacement * mix(0.2, 0.7, vMultiplier);
+    texture += vDisplacement * mix(0.2, 0.7, uMultiplier);
     value = 1. + vDisplacement * 2.;
   }
 

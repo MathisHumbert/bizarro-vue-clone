@@ -7,16 +7,20 @@ import { lerp } from '../../utils/math';
 
 export default class Media {
   constructor({
+    homeItem,
     homeLink,
     homeMedia,
+    caseMedia,
     scene,
     geometry,
     screen,
     viewport,
     containerHeight,
   }) {
+    this.homeItem = homeItem;
     this.homeLink = homeLink;
     this.homeMedia = homeMedia;
+    this.caseMedia = caseMedia;
     this.scene = scene;
     this.geometry = geometry;
     this.screen = screen;
@@ -28,7 +32,7 @@ export default class Media {
     this.isHover = false;
     this.isOpen = false;
     this.scroll = 0;
-    this.extra = 0;
+    this.transition = 0;
     this.textureLoader = new THREE.TextureLoader();
     this.alpha = {
       current: 0,
@@ -39,6 +43,7 @@ export default class Media {
     this.createTexture();
     this.createMaterial();
     this.createMesh();
+    this.createTween();
 
     this.addEventListeners();
     this.onResize({ viewport, screen, containerHeight });
@@ -74,13 +79,21 @@ export default class Media {
   }
 
   createBounds() {
-    const rect = this.homeMedia.getBoundingClientRect();
+    const homeRect = this.homeMedia.getBoundingClientRect();
+    const caseRect = this.caseMedia.getBoundingClientRect();
 
-    this.bounds = {
-      top: rect.top + this.scroll,
-      left: rect.left,
-      width: rect.width,
-      height: rect.height,
+    this.boundsHome = {
+      top: homeRect.top + this.scroll,
+      left: homeRect.left,
+      width: homeRect.width,
+      height: homeRect.height,
+    };
+
+    this.boundsCase = {
+      top: caseRect.top + this.scroll,
+      left: caseRect.left,
+      width: caseRect.width,
+      height: caseRect.height,
     };
 
     this.updateScale();
@@ -88,29 +101,66 @@ export default class Media {
     this.updateY(this.scroll);
   }
 
+  createTween() {
+    this.animation = gsap.timeline({ paused: true });
+
+    this.animation
+      .fromTo(
+        this,
+        { transition: 0 },
+        { transition: 1, delay: 0.5, duration: 1.5, ease: 'expo.inOut' },
+        0
+      )
+      .fromTo(
+        this.material.uniforms.uMultiplier,
+        { value: 1 },
+        { value: 0, duration: 1.5, ease: 'power4.in' },
+        0
+      );
+  }
+
   /**
    * Update.
    */
   updateScale() {
-    this.mesh.scale.x =
-      (this.viewport.width * this.bounds.width) / this.screen.width;
-    this.mesh.scale.y =
-      (this.viewport.height * this.bounds.height) / this.screen.height;
+    const width = lerp(
+      this.boundsHome.width,
+      this.boundsCase.width,
+      this.transition
+    );
+    const height = lerp(
+      this.boundsHome.height,
+      this.boundsCase.height,
+      this.transition
+    );
+
+    this.mesh.scale.x = (this.viewport.width * width) / this.screen.width;
+    this.mesh.scale.y = (this.viewport.height * height) / this.screen.height;
   }
 
-  updateX(x = 0) {
+  updateX() {
+    const postionX = lerp(
+      this.boundsHome.left,
+      this.boundsCase.left,
+      this.transition
+    );
+
     this.mesh.position.x =
       -this.viewport.width / 2 +
       this.mesh.scale.x / 2 +
-      ((this.bounds.left - x) / this.screen.width) * this.viewport.width;
+      (postionX / this.screen.width) * this.viewport.width;
   }
 
   updateY(y = 0) {
+    const positionY = lerp(
+      ((this.boundsHome.top - y) / this.screen.height) * this.viewport.height -
+        this.extra,
+      (this.boundsCase.top / this.screen.height) * this.viewport.height,
+      this.transition
+    );
+
     this.mesh.position.y =
-      this.viewport.height / 2 -
-      this.mesh.scale.y / 2 -
-      ((this.bounds.top - y) / this.screen.height) * this.viewport.height -
-      this.extra;
+      this.viewport.height / 2 - this.mesh.scale.y / 2 - positionY;
   }
 
   updateAlpha() {
@@ -170,6 +220,18 @@ export default class Media {
     this.isHover = false;
   }
 
+  onOpen() {
+    this.isOpen = true;
+
+    this.animation.play();
+  }
+
+  onClose() {
+    this.isOpen = false;
+
+    this.animation.reverse();
+  }
+
   /**
    * Loop.
    */
@@ -181,6 +243,8 @@ export default class Media {
         this.direction === 'left' ? time : -time;
     }
 
+    this.updateScale();
+    this.updateX();
     this.updateY(scroll);
     this.updateAlpha();
 
@@ -191,13 +255,14 @@ export default class Media {
     this.isAfter = this.mesh.position.y - planeOffset > viewportOffset;
 
     if (direction === 'down' && this.isBefore) {
-      this.extra -= this.containerHeight;
+      this.extra += this.containerHeight;
 
       this.isBefore = false;
       this.isAfter = false;
     }
+
     if (direction === 'up' && this.isAfter) {
-      this.extra += this.containerHeight;
+      this.extra -= this.containerHeight;
 
       this.isBefore = false;
       this.isAfter = false;
@@ -213,5 +278,11 @@ export default class Media {
     this.homeLink.addEventListener('mouseenter', this.onMouseEnter.bind(this));
 
     this.homeLink.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+
+    this.homeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      this.onOpen();
+    });
   }
 }

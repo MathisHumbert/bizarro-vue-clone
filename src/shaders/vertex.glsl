@@ -1,3 +1,5 @@
+precision mediump float;
+
 attribute vec3 position;
 attribute vec2 uv;
 
@@ -9,7 +11,6 @@ uniform float uMultiplier;
 
 varying vec2 vUv;
 varying float vDisplacement;
-varying float vMultiplier;
 
 void main(){
   vec3 pos = position;
@@ -20,7 +21,6 @@ void main(){
 
   vUv = uv;
   vDisplacement = pos.z;
-  vMultiplier = uMultiplier;
   
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.);
 }

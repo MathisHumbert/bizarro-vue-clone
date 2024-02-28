@@ -4,16 +4,13 @@ import NormalizeWheel from 'normalize-wheel';
 
 import HomeItem from '../components/HomeItem.vue';
 import data from '../data/home.json';
-import { usePageStore } from '../stores/page';
 import emitter from '../utils/eventBus';
 import { lerp } from '../utils/math';
 
 const list = ref(data);
-const scroll = ref({ current: 0, target: 0, last: 0 });
+const scroll = ref({ current: 0, target: 0, last: 0, direction: 'up' });
 const listElement = ref(null);
 const containerHeight = ref(0);
-
-const pageStore = usePageStore();
 
 onMounted(() => {
   containerHeight.value = listElement.value.clientHeight;
@@ -32,24 +29,13 @@ onMounted(() => {
   emitter.on('tick', () => {
     scroll.value.current = lerp(scroll.value.current, scroll.value.target, 0.1);
 
-    let direction;
-
     if (scroll.value.current > scroll.value.last) {
-      direction = 'up';
+      scroll.value.direction = 'up';
     } else if (scroll.value.current < scroll.value.last) {
-      direction = 'down';
+      scroll.value.direction = 'down';
     }
 
     scroll.value.last = scroll.value.current;
-
-    pageStore.setScroll({
-      position: 0,
-      current: scroll.value.current,
-      target: scroll.value.target,
-      last: scroll.value.last,
-      limit: 0,
-      direction,
-    });
   });
 });
 </script>
@@ -60,7 +46,10 @@ onMounted(() => {
       <div class="home__background__top"></div>
       <div class="home__background__bottom"></div>
     </div>
-    <div class="home__wrapper" ref="wrapperElement">
+    <div class="home__wrapper" id="wrapper" ref="wrapperElement">
+      <div class="home__case">
+        <div class="home__case__media"></div>
+      </div>
       <ul class="home__list" ref="listElement">
         <HomeItem
           v-for="item in list"
@@ -69,6 +58,7 @@ onMounted(() => {
           :title="item.title"
           :direction="item.direction"
           :containerHeight="containerHeight"
+          :scroll="scroll"
         />
       </ul>
     </div>
@@ -115,5 +105,23 @@ onMounted(() => {
   @include media('<=phone') {
     display: block;
   }
+}
+
+.home__case {
+  position: absolute;
+  left: 0;
+  top: 27rem;
+  width: 100%;
+
+  &:after {
+    content: '';
+    display: inline-block;
+    padding-top: calc(768 / 1366 * 100%);
+    width: 100%;
+  }
+}
+
+.home__case__media {
+  @extend %cover;
 }
 </style>

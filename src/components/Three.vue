@@ -6,13 +6,11 @@ import imagesLoaded from 'imagesloaded';
 
 import Canvas from '../three';
 import emitter from '../utils/eventBus';
-import { usePageStore } from '../stores/page';
 
 const canvasElement = ref(null);
 const canvas = ref(null);
 
 const { textures } = defineProps(['textures']);
-const pageStore = usePageStore();
 
 const route = useRoute();
 
@@ -20,6 +18,7 @@ onMounted(() => {
   canvas.value = new Canvas({
     template: route.path,
     element: canvasElement.value,
+    emitter,
     textures,
   });
 
@@ -27,8 +26,8 @@ onMounted(() => {
     canvas.value.onResize();
   });
 
-  emitter.on('tick', () => {
-    canvas.value.tick(pageStore.scroll.current, pageStore.scroll.direction);
+  emitter.on('wheel', (e) => {
+    canvas.value.onWheel(e);
   });
 });
 
