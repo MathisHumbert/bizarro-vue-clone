@@ -1,0 +1,152 @@
+[
+  {
+    "id": "xbox-museum",
+    "title": "XBOX MUSEUM",
+    "direction": "left"
+  },
+  {
+    "id": "bbdo",
+    "title": "BBDO",
+    "direction": "right"
+  },
+  {
+    "id": "peggy-gou",
+    "title": "PEGGY GOU",
+    "direction": "left"
+  },
+  {
+    "id": "isabel-moranta",
+    "title": "ISABEL MORANTA",
+    "direction": "left"
+  },
+  {
+    "id": "floema",
+    "title": "FLOEMA",
+    "direction": "left"
+  },
+  {
+    "id": "garoa-skincare",
+    "title": "GAROA SKINCARE",
+    "direction": "right"
+  },
+  {
+    "id": "design-embraced",
+    "title": "DESIGN EMBRACED",
+    "direction": "right"
+  },
+  {
+    "id": "kacper-chlebowicz",
+    "title": "KACPER CHLEBOWICZ",
+    "direction": "left"
+  },
+  {
+    "id": "trolli",
+    "title": "TROLLI",
+    "direction": "right"
+  },
+  {
+    "id": "adventure-time",
+    "title": "ADVENTURE TIME",
+    "direction": "left"
+  },
+  {
+    "id": "studio-maertens",
+    "title": "STUDIO MÆRTENS",
+    "direction": "left"
+  },
+  {
+    "id": "inbound",
+    "title": "INBOUND",
+    "direction": "left"
+  },
+  {
+    "id": "redis",
+    "title": "REDIS",
+    "direction": "left"
+  },
+  {
+    "id": "kaleidoz",
+    "title": "KALEIDOZ",
+    "direction": "left"
+  },
+  {
+    "id": "erika-moreira",
+    "title": "ERIKA MOREIRA",
+    "direction": "right"
+  },
+  {
+    "id": "bruno-arizio",
+    "title": "BRUNO ARIZIO",
+    "direction": "left"
+  },
+  {
+    "id": "dominic-berzins",
+    "title": "DOMINIC BERZINS",
+    "direction": "left"
+  },
+  {
+    "id": "pagethink",
+    "title": "PAGETHINK",
+    "direction": "left"
+  },
+  {
+    "id": "neoway",
+    "title": "NEOWAY",
+    "direction": "left"
+  },
+  {
+    "id": "cult",
+    "title": "CULT",
+    "direction": "right"
+  },
+  {
+    "id": "movida",
+    "title": "MOVIDA",
+    "direction": "left"
+  },
+  {
+    "id": "lufthansa-2",
+    "title": "LUFTHANSA",
+    "direction": "left"
+  },
+  {
+    "id": "tiaa",
+    "title": "TIAA",
+    "direction": "left"
+  },
+  {
+    "id": "lufthansa-1",
+    "title": "LUFTHANSA",
+    "direction": "left"
+  },
+  {
+    "id": "shell",
+    "title": "SHELL",
+    "direction": "left"
+  },
+  {
+    "id": "corvette",
+    "title": "CORVETTE",
+    "direction": "right"
+  },
+  {
+    "id": "nike",
+    "title": "NIKE",
+    "direction": "left"
+  },
+  {
+    "id": "airbnb",
+    "title": "AIRBNB",
+    "direction": "right"
+  },
+  {
+    "id": "discovery-kids",
+    "title": "DISCOVERY KIDS",
+    "direction": "right"
+  },
+  {
+    "id": "rock-in-rio",
+    "title": "ROCK IN RIO",
+    "direction": "left"
+  }
+]
