@@ -32,6 +32,17 @@ export default class Home {
         containerHeight: this.containerElement.clientHeight,
       });
     });
+
+    this.medias.forEach((media) => {
+      const otherMedias = this.medias.filter((m) => m.id !== media.id);
+
+      media.homeLink.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        otherMedias.forEach((m) => m.hide());
+        media.onOpen();
+      });
+    });
   }
 
   /**

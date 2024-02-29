@@ -94,17 +94,29 @@ export default class Media {
   /**
    * Animations.
    */
-  show() {
+  show(firstPage) {
     this.isVisible = true;
 
-    gsap.fromTo(this.material.uniforms.uAlpha, { value: 0 }, { value: 1 });
+    if (firstPage) {
+      gsap.fromTo(
+        this.material.uniforms.uAlpha,
+        { value: 0 },
+        { value: 1, duration: 0.4, delay: 1 }
+      );
+    } else {
+      gsap.set(this.material.uniforms.uAlpha, { value: 1 });
+    }
   }
 
-  hide() {
+  async hide() {
     this.isVisible = false;
 
-    gsap.to(this.material.uniforms.uAlpha, {
-      value: 0,
+    new Promise((res) => {
+      gsap.to(this.material.uniforms.uAlpha, {
+        value: 0,
+        duration: 0.4,
+        onComplete: () => res(),
+      });
     });
   }
 

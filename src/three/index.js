@@ -105,7 +105,7 @@ export default class Canvas {
     }
 
     if (!this.page.includes('/case') && template.includes('/case')) {
-      this.case.show();
+      this.case.show(this.page === '');
     }
 
     this.page = template;

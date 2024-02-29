@@ -11,19 +11,22 @@ import CaseGallery from '../components/CaseGallery.vue';
 import cases from '../data/cases.json';
 import emitter from '../utils/eventBus';
 import { lerp, clamp } from '../utils/math';
+import gsap from 'gsap';
 
 const route = useRoute();
 const { id } = route.params;
 
 const project = ref(cases.find((c) => c.id === id));
-const element = ref(false);
-const wrapperElement = ref(false);
+const element = ref(null);
+const wrapperElement = ref(null);
 const scroll = ref({ current: 0, target: 0, limit: 0 });
 
 const transformPrefix = Prefix('transform');
 
 onMounted(() => {
+  gsap.fromTo(element.value, { autoAlpha: 0 }, { autoAlpha: 1 });
   element.value.classList.add('case--active');
+
   scroll.value.limit = wrapperElement.value.clientHeight - window.innerHeight;
 
   emitter.on('resize', () => {

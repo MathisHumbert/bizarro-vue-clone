@@ -28,7 +28,7 @@ const transformPrefix = Prefix('transform');
 const onLinkClick = async (e) => {
   e.preventDefault();
 
-  gsap.to('.home', { autoAlpha: 0 });
+  gsap.to('.home', { autoAlpha: 0, duration: 0.4 });
 
   await delay(2000);
 
@@ -78,7 +78,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <li :class="`home__item home__item--${props.id}`" ref="element">
+  <li
+    :class="`home__item home__item--${props.id}`"
+    :data-id="props.id"
+    ref="element"
+  >
     <a :href="`/case/${props.id}`" @click="onLinkClick" class="home__link">
       <span class="home__link__wrapper">
         {{ props.title }}

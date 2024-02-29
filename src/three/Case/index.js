@@ -27,22 +27,22 @@ export default class Home {
   /**
    * Animations.
    */
-  show() {
+  show(firstPage) {
     this.createMedia();
 
     this.scene.add(this.group);
 
     if (this.media && this.media.show) {
-      this.media.show();
+      this.media.show(firstPage);
     }
   }
 
-  hide() {
+  async hide() {
     if (this.media && this.media.hide) {
-      this.media.hide();
-    }
+      await this.media.hide();
 
-    this.scene.remove(this.group);
+      this.scene.remove(this.group);
+    }
   }
 
   /**

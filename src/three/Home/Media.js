@@ -26,6 +26,7 @@ export default class Media {
     this.screen = screen;
     this.viewport = viewport;
     this.containerHeight = (viewport.height * containerHeight) / screen.height;
+    this.id = homeItem.dataset.id;
 
     this.direction = homeMedia.dataset.direction;
     this.isVisible = false;
@@ -278,11 +279,5 @@ export default class Media {
     this.homeLink.addEventListener('mouseenter', this.onMouseEnter.bind(this));
 
     this.homeLink.addEventListener('mouseleave', this.onMouseLeave.bind(this));
-
-    this.homeLink.addEventListener('click', (e) => {
-      e.preventDefault();
-
-      this.onOpen();
-    });
   }
 }

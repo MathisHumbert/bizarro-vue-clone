@@ -29,7 +29,7 @@ const { id, title } = defineProps(['id', 'title']);
 .case__media__image {
   @extend %cover;
 
-  opacity: 0.25;
+  opacity: 0;
   transition: opacity 1.5s $ease-out-expo;
 
   .mobile .case--active & {

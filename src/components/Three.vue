@@ -29,6 +29,12 @@ onMounted(() => {
   emitter.on('wheel', (e) => {
     canvas.value.onWheel(e);
   });
+
+  emitter.on('hideCanvas', (path) => {
+    if (path.includes('case')) {
+      canvas.value.case.hide();
+    }
+  });
 });
 
 watch(route, () => {

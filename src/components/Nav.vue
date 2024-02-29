@@ -1,8 +1,16 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
-import { RouterLink } from 'vue-router';
+import { watch, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import gsap from 'gsap';
 
-import { random } from '../utils/math';
+import { delay, random } from '../utils/math';
+import emitter from '../utils/eventBus';
+
+const router = useRouter();
+const route = useRoute();
+
+const currentRoute = ref(router.path);
 
 const onEasterEgg = () => {
   const value = random(0, 360, 0.01);
@@ -10,28 +18,58 @@ const onEasterEgg = () => {
 
   document.documentElement.style.background = background;
 };
+
+const onLinkClick = async (e) => {
+  e.preventDefault();
+
+  if (window.location.pathname === '/about') {
+    gsap.to('.about', { autoAlpha: 0, duration: 0.4 });
+  }
+
+  if (window.location.pathname === '/') {
+    gsap.to('.home', { autoAlpha: 0, duration: 0.4 });
+  }
+
+  if (window.location.pathname.includes('case')) {
+    gsap.to('.case', { autoAlpha: 0, duration: 0.4 });
+  }
+
+  emitter.emit('hideCanvas', window.location.pathname);
+
+  await delay(400);
+
+  const url = e.target.href.replace(window.location.origin, '');
+
+  router.push(url);
+};
+
+watch(route, () => {
+  currentRoute.value = route.path;
+});
 </script>
 
 <template>
   <nav class="navigation">
     <ul class="navigation__list">
       <li class="navigation__item">
-        <RouterLink to="/" class="navigation__link">BIZAR-RØ</RouterLink>
+        <a href="/" @click="onLinkClick" class="navigation__link">BIZAR-RØ</a>
       </li>
       <li class="navigation__item">
-        <RouterLink
-          to="/"
+        <a
+          href="/"
+          @click="onLinkClick"
           class="navigation__link"
-          active-class="navigation__link--active "
-          >Work</RouterLink
+          :class="currentRoute === '/' ? 'navigation__link--active' : ''"
+          >Work</a
         >
       </li>
       <li class="navigation__item">
-        <RouterLink
-          to="/about"
+        <a
+          href="/about"
+          @click="onLinkClick"
           class="navigation__link"
-          active-class="navigation__link--active "
-          >About</RouterLink
+          :class="currentRoute === '/about' ? 'navigation__link--active' : ''"
+          >About</a
         >
       </li>
       <li class="navigation__item">
