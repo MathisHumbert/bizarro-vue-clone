@@ -4,6 +4,11 @@ import SplitType from 'split-type';
 
 import award from '../data/award.json';
 import press from '../data/press.json';
+import { getOffset } from '../utils/dom';
+import emitter from '../utils/eventBus';
+import { clamp } from '../utils/math';
+
+const props = defineProps(['scroll']);
 
 const awards = ref(award);
 const presss = ref(press);
@@ -11,6 +16,9 @@ const paragraphAnimation = ref(null);
 const awardListAnimation = ref(null);
 const pressListAnimation = ref(null);
 const reachParagraphAnimation = ref(null);
+const aboutTitle = ref(null);
+const awardsTitle = ref(null);
+const pressTitle = ref(null);
 
 onMounted(() => {
   [...paragraphAnimation.value.children, reachParagraphAnimation.value].forEach(
@@ -77,13 +85,54 @@ onMounted(() => {
       });
     }).observe(element);
   });
+
+  [aboutTitle.value, awardsTitle.value, pressTitle.value].forEach((element) => {
+    if (window.innerWidth > 812) {
+      const bounding = getOffset(element);
+      element.start = bounding.top;
+      element.limit = getOffset(element.parentNode).height - bounding.height;
+    } else {
+      element.style.transform = '';
+    }
+  });
+
+  emitter.on('resize', () => {
+    [aboutTitle.value, awardsTitle.value, pressTitle.value].forEach(
+      (element) => {
+        if (window.innerWidth > 812) {
+          const bounding = getOffset(element, props.scroll.current);
+          element.start = bounding.top;
+          element.limit =
+            getOffset(element.parentNode).height - bounding.height;
+        } else {
+          element.style.transform = '';
+        }
+      }
+    );
+  });
+
+  emitter.on('tick', () => {
+    if (window.innerWidth > 812) {
+      [aboutTitle.value, awardsTitle.value, pressTitle.value].forEach(
+        (element) => {
+          const y = clamp(
+            0,
+            element.limit,
+            Math.floor(props.scroll.current - element.start)
+          );
+
+          element.style.transform = `translateY(${y}px)`;
+        }
+      );
+    }
+  });
 });
 </script>
 
 <template>
   <div class="about__sections">
     <div class="about__section">
-      <h2 class="about__section__title">About</h2>
+      <h2 class="about__section__title" ref="aboutTitle">About</h2>
       <div class="about__section__content" ref="paragraphAnimation">
         <p class="about__section__description">
           I’m Luis Henrique Bizarro, I’m a Creative Developer based in São
@@ -117,7 +166,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="about__section">
-      <h2 class="about__section__title">
+      <h2 class="about__section__title" ref="awardsTitle">
         Awards <br />
         & Honors
       </h2>
@@ -151,7 +200,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="about__section">
-      <h2 class="about__section__title">PRESS</h2>
+      <h2 class="about__section__title" ref="pressTitle">PRESS</h2>
       <div class="about__section__content">
         <p class="about__section__number">10+</p>
         <ul class="about__section__list" ref="pressListAnimation">

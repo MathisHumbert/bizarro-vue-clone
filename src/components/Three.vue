@@ -10,16 +10,12 @@ import emitter from '../utils/eventBus';
 const canvasElement = ref(null);
 const canvas = ref(null);
 
-const { textures } = defineProps(['textures']);
-
 const route = useRoute();
 
 onMounted(() => {
   canvas.value = new Canvas({
-    template: route.path,
     element: canvasElement.value,
     emitter,
-    textures,
   });
 
   emitter.on('resize', () => {
@@ -35,9 +31,19 @@ onMounted(() => {
       canvas.value.case.hide();
     }
   });
+
+  window.addEventListener('mousedown', (e) => canvas.value.onTouchDown(e));
+  window.addEventListener('mousemove', (e) => canvas.value.onTouchMove(e));
+  window.addEventListener('mouseup', (e) => canvas.value.onTouchUp(e));
+
+  window.addEventListener('touchstart', (e) => canvas.value.onTouchDown(e));
+  window.addEventListener('touchmove', (e) => canvas.value.onTouchMove(e));
+  window.addEventListener('touchend', (e) => canvas.value.onTouchUp(e));
 });
 
 watch(route, () => {
+  canvas.value.reset();
+
   const imagesLoader = imagesLoaded(document.querySelectorAll('img'), {
     background: true,
   });

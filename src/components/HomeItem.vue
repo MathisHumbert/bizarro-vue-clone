@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Prefix from 'prefix';
 import gsap from 'gsap';
@@ -74,6 +74,11 @@ onMounted(() => {
       )}px, 0)`;
     }
   });
+});
+
+onUnmounted(() => {
+  emitter.off('reisze');
+  emitter.off('tick');
 });
 </script>
 

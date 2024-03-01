@@ -9,7 +9,6 @@ export default class Canvas {
   constructor({ element, emitter }) {
     this.canvasElement = element;
     this.emitter = emitter;
-    // this.textures = textures;
 
     this.page = '';
     this.clock = new THREE.Clock();
@@ -17,8 +16,10 @@ export default class Canvas {
       current: 0,
       target: 0,
       limit: 0,
+      position: 0,
       direction: 'up',
     };
+    this.isDown = false;
 
     this.createScene();
     this.createCamera();
@@ -111,7 +112,7 @@ export default class Canvas {
     this.page = template;
 
     this.wrapperElement = document.getElementById('wrapper');
-    this.scroll.current = this.scroll.target = this.scroll.last = 0;
+    this.reset();
 
     this.onResize();
   }
@@ -157,26 +158,52 @@ export default class Canvas {
     }
   }
 
+  onTouchDown(event) {
+    if (window.innerWidth > 812) return;
+
+    this.isDown = true;
+
+    this.scroll.position = this.scroll.current;
+    this.start = event.touches ? event.touches[0].clientY : event.clientY;
+  }
+
+  onTouchMove(event) {
+    if (window.innerWidth > 812 || !this.isDown) return;
+
+    const y = event.touches ? event.touches[0].clientY : event.clientY;
+    const distance = (this.start - y) * (this.page === '/' ? 2 : 3);
+
+    this.scroll.target = this.scroll.position + distance;
+  }
+
+  onTouchUp() {
+    if (window.innerWidth > 812) return;
+
+    this.isDown = false;
+  }
+
+  reset() {
+    this.scroll = {
+      current: 0,
+      target: 0,
+      limit: 0,
+      direction: 'up',
+    };
+  }
+
   /**
    * Loop.
    */
   update() {
-    // pass scroll ?
-    this.emitter.emit('tick');
-
-    if (this.page === '/') {
-      this.renderer.render(this.scene, this.camera);
-    }
-
     const elapsedTime = this.clock.getElapsedTime();
 
-    if (this.page.includes('/case')) {
+    if (this.page !== '/') {
       this.scroll.target = clamp(0, this.scroll.limit, this.scroll.target);
     }
 
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, 0.1);
 
-    if (this.page.includes('/case')) {
+    if (this.page !== '/') {
       if (this.scroll.target === 0) {
         this.scroll.current = Math.floor(this.scroll.current);
       } else {
@@ -194,6 +221,8 @@ export default class Canvas {
       this.scroll.direction = 'down';
     }
 
+    this.emitter.emit('tick', this.scroll);
+
     if (this.home && this.home.update) {
       this.home.update({
         scroll: this.scroll.current,
@@ -210,9 +239,7 @@ export default class Canvas {
 
     this.scroll.last = this.scroll.current;
 
-    if (this.page !== '/') {
-      this.renderer.render(this.scene, this.camera);
-    }
+    this.renderer.render(this.scene, this.camera);
 
     window.requestAnimationFrame(this.update.bind(this));
   }

@@ -1,11 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import NormalizeWheel from 'normalize-wheel';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 import HomeItem from '../components/HomeItem.vue';
 import data from '../data/home.json';
 import emitter from '../utils/eventBus';
-import { lerp } from '../utils/math';
 
 const list = ref(data);
 const scroll = ref({ current: 0, target: 0, last: 0, direction: 'up' });
@@ -17,26 +15,16 @@ onMounted(() => {
 
   emitter.on('resize', () => {
     containerHeight.value = listElement.value.clientHeight;
-    scroll.value = { current: 0, target: 0, last: 0 };
   });
 
-  emitter.on('wheel', (e) => {
-    const normalized = NormalizeWheel(e);
-
-    scroll.value.target += normalized.pixelY * 0.5;
+  emitter.on('tick', (canvasScroll) => {
+    scroll.value = canvasScroll;
   });
+});
 
-  emitter.on('tick', () => {
-    scroll.value.current = lerp(scroll.value.current, scroll.value.target, 0.1);
-
-    if (scroll.value.current > scroll.value.last) {
-      scroll.value.direction = 'up';
-    } else if (scroll.value.current < scroll.value.last) {
-      scroll.value.direction = 'down';
-    }
-
-    scroll.value.last = scroll.value.current;
-  });
+onUnmounted(() => {
+  emitter.off('resize');
+  emitter.off('tick');
 });
 </script>
 
@@ -113,11 +101,17 @@ onMounted(() => {
   top: 27rem;
   width: 100%;
 
+  border: 1px solid red;
+
   &:after {
     content: '';
     display: inline-block;
     padding-top: calc(768 / 1366 * 100%);
     width: 100%;
+  }
+
+  @include media('<=phone') {
+    top: 10rem;
   }
 }
 

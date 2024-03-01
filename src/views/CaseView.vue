@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
-import NormalizeWheel from 'normalize-wheel';
 import Prefix from 'prefix';
+import gsap from 'gsap';
 
 import CaseHeader from '../components/CaseHeader.vue';
 import CaseInformation from '../components/CaseInformation.vue';
@@ -10,8 +10,6 @@ import CaseGallery from '../components/CaseGallery.vue';
 
 import cases from '../data/cases.json';
 import emitter from '../utils/eventBus';
-import { lerp, clamp } from '../utils/math';
-import gsap from 'gsap';
 
 const route = useRoute();
 const { id } = route.params;
@@ -27,39 +25,19 @@ onMounted(() => {
   gsap.fromTo(element.value, { autoAlpha: 0 }, { autoAlpha: 1 });
   element.value.classList.add('case--active');
 
-  scroll.value.limit = wrapperElement.value.clientHeight - window.innerHeight;
-
-  emitter.on('resize', () => {
-    scroll.value.limit = wrapperElement.value.clientHeight - window.innerHeight;
-  });
-
-  emitter.on('wheel', (e) => {
-    const normalized = NormalizeWheel(e);
-
-    scroll.value.target += normalized.pixelY;
-  });
-
-  emitter.on('tick', () => {
-    scroll.value.target = clamp(0, scroll.value.limit, scroll.value.target);
-
-    scroll.value.current = lerp(scroll.value.current, scroll.value.target, 0.1);
-
-    if (scroll.value.target === 0) {
-      scroll.value.current = Math.floor(scroll.value.current);
-    } else {
-      scroll.value.current = Math.ceil(scroll.value.current);
-    }
-
-    if (scroll.value.current < 0.1) {
-      scroll.value.current = 0;
-    }
+  emitter.on('tick', (canvasScroll) => {
+    scroll.value = canvasScroll;
 
     if (element.value) {
-      element.value.style[transformPrefix] = `translate3d(0, ${Math.floor(
-        -scroll.value.current
-      )}px, 0)`;
+      wrapperElement.value.style[
+        transformPrefix
+      ] = `translate3d(0, ${Math.floor(-scroll.value.current)}px, 0)`;
     }
   });
+});
+
+onUnmounted(() => {
+  emitter.off('tick');
 });
 </script>
 
@@ -88,5 +66,9 @@ onMounted(() => {
   @extend %page__wrapper;
 
   padding: 15rem 0;
+
+  @include media('<=phone') {
+    padding: 5rem 0;
+  }
 }
 </style>
